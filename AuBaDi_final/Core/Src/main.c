@@ -57,11 +57,17 @@ TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim10;
 
 /* USER CODE BEGIN PV */
-#define WAV_FILE "audio/1.wav"
+#define WAV_FILE_menu "audio/orfeus.wav"
+#define WAV_FILE_1 "audio/house.wav"
+#define WAV_FILE_2 "audio/orfeus.wav"
+#define WAV_FILE_3 "audio/house.wav"
+
+
 volatile int duty = 0;
 volatile int confirm = 0;
 volatile int selection = 0;
 volatile int old_selection = -1;
+volatile int audio_flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -152,7 +158,7 @@ int main(void) {
 
 	/****************************** DAC AUDIO INIT ******************************/
 	CS43_Init(hi2c1, MODE_I2S);
-	CS43_SetVolume(200); //0-255
+	CS43_SetVolume(255); //0-255
 	CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
 	audioI2S_setHandle(&hi2s3);
 	bool isSdCardMounted = 0;
@@ -183,58 +189,63 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-		/****************************** MENU ************************************/
+		/*********************************** MENU ************************************/
 
 		if (selection != old_selection) {
-			if(selection <= 3 && selection >=0){
-			switch (selection) {
+			if (selection <= 3 && selection >= 0) {
+				switch (selection) {
 
-			case 0:
-				lcd16x2_i2c_clear();
-				lcd16x2_i2c_1stLine();
-				lcd16x2_i2c_printf("Barman AuBaDi ");
-				lcd16x2_i2c_2ndLine();
-				lcd16x2_i2c_printf("<-WYBOR NAPOJU->");
-				break;
+				case 0:
+					lcd16x2_i2c_clear();
+					lcd16x2_i2c_1stLine();
+					lcd16x2_i2c_printf(" Barman AuBaDi ");
+					lcd16x2_i2c_2ndLine();
+					lcd16x2_i2c_printf("<-WYBOR NAPOJU->");
+					audio_flag = 4;
+					break;
 
-			case 1:
-				lcd16x2_i2c_clear();
-				lcd16x2_i2c_1stLine();
-				lcd16x2_i2c_printf("Barman AuBaDi ");
-				lcd16x2_i2c_2ndLine();
-				lcd16x2_i2c_printf("<-   NAPOJ 1  ->");
-				break;
+				case 1:
+					lcd16x2_i2c_clear();
+					lcd16x2_i2c_1stLine();
+					lcd16x2_i2c_printf("Barman AuBaDi ");
+					lcd16x2_i2c_2ndLine();
+					lcd16x2_i2c_printf("<-   NAPOJ 1  ->");
+					audio_flag = 1;
+					break;
 
-			case 2:
-				lcd16x2_i2c_clear();
-				lcd16x2_i2c_1stLine();
-				lcd16x2_i2c_printf("Barman AuBaDi ");
-				lcd16x2_i2c_2ndLine();
-				lcd16x2_i2c_printf("<-   NAPOJ 2  ->");
-				break;
+				case 2:
+					lcd16x2_i2c_clear();
+					lcd16x2_i2c_1stLine();
+					lcd16x2_i2c_printf("Barman AuBaDi ");
+					lcd16x2_i2c_2ndLine();
+					lcd16x2_i2c_printf("<-   NAPOJ 2  ->");
+					audio_flag = 2;
+					break;
 
-			case 3:
-				lcd16x2_i2c_clear();
-				lcd16x2_i2c_1stLine();
-				lcd16x2_i2c_printf("Barman AuBaDi ");
-				lcd16x2_i2c_2ndLine();
-				lcd16x2_i2c_printf("<-   NAPOJ 3  ->");
-				break;
+				case 3:
+					lcd16x2_i2c_clear();
+					lcd16x2_i2c_1stLine();
+					lcd16x2_i2c_printf("Barman AuBaDi ");
+					lcd16x2_i2c_2ndLine();
+					lcd16x2_i2c_printf("<-   NAPOJ 3  ->");
+					audio_flag = 3;
+					break;
+				}
+				old_selection = selection;
 			}
-			old_selection = selection;
-			}
 
-			else{
+			else {
 				selection = 0;
 			}
 
-
 		}
 
-
+		/*********************************** LED PWM  ************************************/
 		TIM5->CCR2 = duty;
 		TIM5->CCR3 = duty;
 		TIM5->CCR4 = 1000;
+
+		/*********************************** AUDIO ****************************************/
 
 		if (Appli_state == APPLICATION_START) {
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
@@ -251,22 +262,62 @@ int main(void) {
 				isSdCardMounted = 1;
 			}
 
-			if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-				HAL_Delay(500);
-				wavPlayer_fileSelect(WAV_FILE);
-//				lcd16x2_i2c_clear();
-//				lcd16x2_i2c_printf("Odtwarzam teraz ");
-//				lcd16x2_i2c_2ndLine();
-//				lcd16x2_i2c_printf("%s", WAV_FILE);
+			if (audio_flag == 1) {
+				if (!wavPlayer_isFinished()) {
+					wavPlayer_stop();
+				} else {
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+					HAL_Delay(500);
+					wavPlayer_fileSelect(WAV_FILE_1);
+					wavPlayer_play();
+					audio_flag = 0;
+				}
+			}
 
-				wavPlayer_play();
+			else if (audio_flag == 2) {
+				if (!wavPlayer_isFinished()) {
+					wavPlayer_stop();
+				} else {
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+					HAL_Delay(500);
+					wavPlayer_fileSelect(WAV_FILE_2);
+					wavPlayer_play();
+					audio_flag = 0;
+				}
+			}
 
+			else if (audio_flag == 3) {
+				if (!wavPlayer_isFinished()) {
+					wavPlayer_stop();
+				} else {
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+					HAL_Delay(500);
+					wavPlayer_fileSelect(WAV_FILE_3);
+					wavPlayer_play();
+					audio_flag = 0;
+				}
+			}
+
+			else if (audio_flag == 4) {
+				if (!wavPlayer_isFinished()) {
+					wavPlayer_stop();
+				} else {
+					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+					HAL_Delay(500);
+					wavPlayer_fileSelect(WAV_FILE_menu);
+					wavPlayer_play();
+					audio_flag = 0;
+				}
 			}
 
 		}
-// audio process
+
 		wavPlayer_process();
+
+
+
+
+
 
 		/* USER CODE END WHILE */
 		MX_USB_HOST_Process();
