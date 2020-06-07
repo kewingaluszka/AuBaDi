@@ -60,8 +60,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TIM4_PERIOD 999
-#define TIM4_PRESCALER 99
+#define TIM4_PERIOD 850
+#define TIM4_PRESCALER 200
 #define TIM5_PRESCALER 700
 #define TIM5_PERIOD 700
 #define TIM10_PERIOD 850
@@ -80,6 +80,7 @@ void Error_Handler(void);
 #define I2C2_SCL_GPIO_Port GPIOB
 #define endstop_Pin GPIO_PIN_11
 #define endstop_GPIO_Port GPIOD
+#define endstop_EXTI_IRQn EXTI15_10_IRQn
 #define dir_Pin GPIO_PIN_6
 #define dir_GPIO_Port GPIOC
 #define I2S3_MCK_Pin GPIO_PIN_7
