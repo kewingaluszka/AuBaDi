@@ -75,7 +75,14 @@ static void MX_TIM10_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if (htim == &htim10) {
+		if (duty < 1000) {
+			duty++;
+		} else
+			duty = 0;
+	}
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -129,18 +136,35 @@ int main(void) {
 	bool isSdCardMounted = 0;
 	bool pauseResumeToggle = 0;
 
-
 	/******************************LCD INIT ************************************/
 	lcd16x2_i2c_init(&hi2c2);
+	lcd16x2_i2c_1stLine();
 	lcd16x2_i2c_printf("first line");
 	lcd16x2_i2c_2ndLine();
 	lcd16x2_i2c_printf("second line");
+
+	/******************************PWM INIT ************************************/
+	HAL_TIM_Base_Start_IT(&htim10);
+	//blue LED
+	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 0);
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
+	//green LED
+	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 0);
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);
+	//red LED
+	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_4, 0);
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4);
+
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+
+		TIM5->CCR2 = duty;
+		TIM5->CCR3 = duty;
+		TIM5->CCR4 = 1000;
 
 		if (Appli_state == APPLICATION_START) {
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
@@ -173,62 +197,6 @@ int main(void) {
 		}
 // audio process
 		wavPlayer_process();
-
-		/*
-		 if (Appli_state == APPLICATION_START) {
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-		 }
-
-		 else if (Appli_state == APPLICATION_DISCONNECT) {
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-
-		 }
-
-		 if (Appli_state == APPLICATION_READY) {
-		 if (!isSdCardMounted) {
-		 f_mount(&USBHFatFS, (const TCHAR*) USBHPath, 0);
-		 isSdCardMounted = 1;
-		 }
-
-		 if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-		 HAL_Delay(500);
-		 wavPlayer_fileSelect(WAV_FILE);
-		 //				lcd16x2_i2c_clear();
-		 //				lcd16x2_i2c_printf("Odtwarzam teraz ");
-		 //				lcd16x2_i2c_2ndLine();
-		 //				lcd16x2_i2c_printf("%s", WAV_FILE);
-
-		 wavPlayer_play();
-
-		 while (!wavPlayer_isFinished()) {
-		 wavPlayer_process();
-		 if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-		 pauseResumeToggle ^= 1;
-		 if (pauseResumeToggle) {
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-		 wavPlayer_pause();
-		 HAL_Delay(200);
-		 } else {
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14,
-		 GPIO_PIN_RESET);
-		 HAL_Delay(1000);
-		 wavPlayer_resume();
-		 if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-		 wavPlayer_stop();
-		 }
-		 {
-		 wavPlayer_resume();
-		 }
-		 }
-		 }
-
-		 }
-		 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-		 HAL_Delay(1000);
-		 }
-
-		 }*/
 
 		/* USER CODE END WHILE */
 		MX_USB_HOST_Process();
