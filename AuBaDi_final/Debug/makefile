@@ -48,8 +48,8 @@ AuBaDi_final.bin \
 all: AuBaDi_final.elf secondary-outputs
 
 # Tool invocations
-AuBaDi_final.elf: $(OBJS) $(USER_OBJS) C:\Users\kewin\STM32CubeIDE\workspace_1.3.0\AuBaDi_final\STM32F411VETX_FLASH.ld
-	arm-none-eabi-gcc -o "AuBaDi_final.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\kewin\STM32CubeIDE\workspace_1.3.0\AuBaDi_final\STM32F411VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="AuBaDi_final.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+AuBaDi_final.elf: $(OBJS) $(USER_OBJS) C:\Users\kewin\git\AuBaDi_final\AuBaDi_final\STM32F411VETX_FLASH.ld
+	arm-none-eabi-gcc -o "AuBaDi_final.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\kewin\git\AuBaDi_final\AuBaDi_final\STM32F411VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="AuBaDi_final.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
