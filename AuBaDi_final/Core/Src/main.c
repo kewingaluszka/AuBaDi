@@ -59,7 +59,9 @@ TIM_HandleTypeDef htim10;
 /* USER CODE BEGIN PV */
 #define WAV_FILE "audio/1.wav"
 volatile int duty = 0;
-
+volatile int confirm = 0;
+volatile int selection = 0;
+volatile int old_selection = -1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,6 +85,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			duty = 0;
 	}
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+//	left button
+	if (GPIO_Pin == button_left_Pin) {
+		confirm = 0;
+		selection--;
+	}
+
+//	right button
+	if (GPIO_Pin == button_right_Pin) {
+		confirm = 0;
+		selection++;
+	}
+
+	//	menu butt on
+	if (GPIO_Pin == button_select_Pin) {
+		confirm = 1;
+	}
+}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -128,7 +150,7 @@ int main(void) {
 	MX_TIM10_Init();
 	/* USER CODE BEGIN 2 */
 
-	/******************************DAC AUDIO INIT ******************************/
+	/****************************** DAC AUDIO INIT ******************************/
 	CS43_Init(hi2c1, MODE_I2S);
 	CS43_SetVolume(200); //0-255
 	CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
@@ -136,14 +158,14 @@ int main(void) {
 	bool isSdCardMounted = 0;
 	bool pauseResumeToggle = 0;
 
-	/******************************LCD INIT ************************************/
+	/****************************** LCD INIT ************************************/
 	lcd16x2_i2c_init(&hi2c2);
 	lcd16x2_i2c_1stLine();
-	lcd16x2_i2c_printf("first line");
+	lcd16x2_i2c_printf("Barman AuBaDi ");
 	lcd16x2_i2c_2ndLine();
-	lcd16x2_i2c_printf("second line");
+	lcd16x2_i2c_printf("< WYBIERZ NAPOJ >");
 
-	/******************************PWM INIT ************************************/
+	/****************************** PWM LIGHTNING INIT **************************/
 	HAL_TIM_Base_Start_IT(&htim10);
 	//blue LED
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, 0);
@@ -155,12 +177,60 @@ int main(void) {
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_4, 0);
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4);
 
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+
+		/****************************** MENU ************************************/
+
+		if (selection != old_selection) {
+			if(selection <= 3 && selection >=0){
+			switch (selection) {
+
+			case 0:
+				lcd16x2_i2c_clear();
+				lcd16x2_i2c_1stLine();
+				lcd16x2_i2c_printf("Barman AuBaDi ");
+				lcd16x2_i2c_2ndLine();
+				lcd16x2_i2c_printf("<-WYBOR NAPOJU->");
+				break;
+
+			case 1:
+				lcd16x2_i2c_clear();
+				lcd16x2_i2c_1stLine();
+				lcd16x2_i2c_printf("Barman AuBaDi ");
+				lcd16x2_i2c_2ndLine();
+				lcd16x2_i2c_printf("<-   NAPOJ 1  ->");
+				break;
+
+			case 2:
+				lcd16x2_i2c_clear();
+				lcd16x2_i2c_1stLine();
+				lcd16x2_i2c_printf("Barman AuBaDi ");
+				lcd16x2_i2c_2ndLine();
+				lcd16x2_i2c_printf("<-   NAPOJ 2  ->");
+				break;
+
+			case 3:
+				lcd16x2_i2c_clear();
+				lcd16x2_i2c_1stLine();
+				lcd16x2_i2c_printf("Barman AuBaDi ");
+				lcd16x2_i2c_2ndLine();
+				lcd16x2_i2c_printf("<-   NAPOJ 3  ->");
+				break;
+			}
+			old_selection = selection;
+			}
+
+			else{
+				selection = 0;
+			}
+
+
+		}
+
 
 		TIM5->CCR2 = duty;
 		TIM5->CCR3 = duty;
@@ -185,10 +255,10 @@ int main(void) {
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 				HAL_Delay(500);
 				wavPlayer_fileSelect(WAV_FILE);
-				lcd16x2_i2c_clear();
-				lcd16x2_i2c_printf("Odtwarzam teraz ");
-				lcd16x2_i2c_2ndLine();
-				lcd16x2_i2c_printf("%s", WAV_FILE);
+//				lcd16x2_i2c_clear();
+//				lcd16x2_i2c_printf("Odtwarzam teraz ");
+//				lcd16x2_i2c_2ndLine();
+//				lcd16x2_i2c_printf("%s", WAV_FILE);
 
 				wavPlayer_play();
 
