@@ -59,8 +59,7 @@ TIM_HandleTypeDef htim10;
 /* USER CODE BEGIN PV */
 #define WAV_FILE "audio/1.wav"
 volatile int duty = 0;
-volatile int selection = 0;
-volatile int confirm = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -76,7 +75,6 @@ static void MX_TIM10_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-
 
 /* USER CODE END PFP */
 
@@ -122,17 +120,17 @@ int main(void) {
 	MX_TIM5_Init();
 	MX_TIM10_Init();
 	/* USER CODE BEGIN 2 */
+
+	/******************************DAC AUDIO INIT ******************************/
 	CS43_Init(hi2c1, MODE_I2S);
 	CS43_SetVolume(200); //0-255
 	CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
-	HAL_TIM_Base_Start_IT(&htim10);
 	audioI2S_setHandle(&hi2s3);
-
 	bool isSdCardMounted = 0;
 	bool pauseResumeToggle = 0;
 
 
-
+	/******************************LCD INIT ************************************/
 	lcd16x2_i2c_init(&hi2c2);
 	lcd16x2_i2c_printf("first line");
 	lcd16x2_i2c_2ndLine();
@@ -143,10 +141,6 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-
-		TIM5->CCR2 = duty;
-		TIM5->CCR3 = duty;
-		TIM5->CCR4 = 1000;
 
 		if (Appli_state == APPLICATION_START) {
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
