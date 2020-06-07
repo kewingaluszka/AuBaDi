@@ -58,7 +58,9 @@ TIM_HandleTypeDef htim10;
 
 /* USER CODE BEGIN PV */
 #define WAV_FILE "audio/1.wav"
-
+volatile int duty = 0;
+volatile int selection = 0;
+volatile int confirm = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -131,6 +133,10 @@ int main(void) {
 
 
 
+	lcd16x2_i2c_init(&hi2c2);
+	lcd16x2_i2c_printf("first line");
+	lcd16x2_i2c_2ndLine();
+	lcd16x2_i2c_printf("second line");
 
 	/* USER CODE END 2 */
 
@@ -138,7 +144,9 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 
-
+		TIM5->CCR2 = duty;
+		TIM5->CCR3 = duty;
+		TIM5->CCR4 = 1000;
 
 		if (Appli_state == APPLICATION_START) {
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
@@ -159,7 +167,10 @@ int main(void) {
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 				HAL_Delay(500);
 				wavPlayer_fileSelect(WAV_FILE);
-
+				lcd16x2_i2c_clear();
+				lcd16x2_i2c_printf("Odtwarzam teraz ");
+				lcd16x2_i2c_2ndLine();
+				lcd16x2_i2c_printf("%s", WAV_FILE);
 
 				wavPlayer_play();
 
