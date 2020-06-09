@@ -66,6 +66,8 @@ void Error_Handler(void);
 #define TIM5_PERIOD 700
 #define TIM10_PERIOD 850
 #define TIM10_PRESCALER 850
+#define TIM3_PERIOD 300
+#define TIM3_PRESCALER 238
 #define button_left_Pin GPIO_PIN_3
 #define button_left_GPIO_Port GPIOE
 #define button_left_EXTI_IRQn EXTI3_IRQn
@@ -76,6 +78,16 @@ void Error_Handler(void);
 #define USB_power_GPIO_Port GPIOC
 #define I2S3_WS_Pin GPIO_PIN_4
 #define I2S3_WS_GPIO_Port GPIOA
+#define pump_relay1_Pin GPIO_PIN_7
+#define pump_relay1_GPIO_Port GPIOE
+#define pump_relay2_Pin GPIO_PIN_9
+#define pump_relay2_GPIO_Port GPIOE
+#define pump_relay3_Pin GPIO_PIN_11
+#define pump_relay3_GPIO_Port GPIOE
+#define pump_relay4_Pin GPIO_PIN_13
+#define pump_relay4_GPIO_Port GPIOE
+#define pump_relay5_Pin GPIO_PIN_15
+#define pump_relay5_GPIO_Port GPIOE
 #define I2C2_SCL_Pin GPIO_PIN_10
 #define I2C2_SCL_GPIO_Port GPIOB
 #define endstop_Pin GPIO_PIN_11
