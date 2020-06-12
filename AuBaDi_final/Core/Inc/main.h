@@ -76,6 +76,12 @@ void Error_Handler(void);
 #define button_select_EXTI_IRQn EXTI9_5_IRQn
 #define USB_power_Pin GPIO_PIN_0
 #define USB_power_GPIO_Port GPIOC
+#define TIM5_CH2_Pin GPIO_PIN_1
+#define TIM5_CH2_GPIO_Port GPIOA
+#define TIM5_CH3_Pin GPIO_PIN_2
+#define TIM5_CH3_GPIO_Port GPIOA
+#define TIM5_CH4_Pin GPIO_PIN_3
+#define TIM5_CH4_GPIO_Port GPIOA
 #define I2S3_WS_Pin GPIO_PIN_4
 #define I2S3_WS_GPIO_Port GPIOA
 #define pump_relay1_Pin GPIO_PIN_7
@@ -93,6 +99,14 @@ void Error_Handler(void);
 #define endstop_Pin GPIO_PIN_11
 #define endstop_GPIO_Port GPIOD
 #define endstop_EXTI_IRQn EXTI15_10_IRQn
+#define LED_green_Pin GPIO_PIN_12
+#define LED_green_GPIO_Port GPIOD
+#define LED_orange_Pin GPIO_PIN_13
+#define LED_orange_GPIO_Port GPIOD
+#define LED_red_Pin GPIO_PIN_14
+#define LED_red_GPIO_Port GPIOD
+#define LED_blue_Pin GPIO_PIN_15
+#define LED_blue_GPIO_Port GPIOD
 #define dir_Pin GPIO_PIN_6
 #define dir_GPIO_Port GPIOC
 #define I2S3_MCK_Pin GPIO_PIN_7
